@@ -25,5 +25,8 @@ Currently only supports OS X.
 
 - Each search is somehow being repeated, causing iTunes to open and close various times.
 
+# Other Info
+If you don't want to use helm, you could potentially replicate its functionality using [buttons](http://www.gnu.org/software/emacs/manual/html_node/elisp/Buttons.html) and writing the result to a temporary buffer.
+
 # Credits
 Inspired by Kris Jenkins' [helm-spotify](https://github.com/krisajenkins/helm-spotify).

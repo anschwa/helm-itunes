@@ -1,4 +1,4 @@
-;;; helm-itunes.el Play local Spotify Tracks
+;;; helm-itunes.el --- Play local iTunes and Spotify tracks
 ;; Copyright 2014 Adam Schwartz
 ;;
 ;; Author: Adam Schwartz <adam@adamschwartz.io>
@@ -6,7 +6,7 @@
 ;;
 ;; Created: 2014-06-02
 ;; Version: 0.0.1
-;; Package-Requires: (helm "0.0.0")
+;; Package-Requires: ((helm "1.6.1"))
 
 ;;; Commentary:
 ;;

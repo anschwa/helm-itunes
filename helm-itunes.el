@@ -28,8 +28,8 @@
 (require 'helm)
 
 ;; Change the music player to Spotify
-(defvar music-player nil "initialize spotify-player variable")
-(setq-default music-player "itunes")
+(defvar helm-itunes-music-player nil "initialize spotify-player variable")
+(setq-default helm-itunes-music-player "itunes")
 
 (defun helm-itunes-player (player)
   "Choose Spotify or iTunes as the music player"
@@ -38,13 +38,13 @@
   (if (or (equal (downcase player) "y")
           (equal (downcase player) "yes"))
       (progn      (message "Player set to Spotify")
-                  (setq music-player "spotify"))
+                  (setq helm-itunes-music-player "spotify"))
     (progn (message "Player set to iTunes"))
-    (setq music-player "itunes")))
+    (setq helm-itunes-music-player "itunes")))
 
 
 ;; AppleScript that searches iTunes for songs.
-(defun search-script (pattern)
+(defun helm-itunes-search-script (pattern)
   (format "-- toggle a variable if iTunes was running before this script was run.
 if application \"iTunes\" is running then
         set irun to true
@@ -80,16 +80,17 @@ return matches" pattern))
 ;; a list of artist, album, and name.
 ;; Finally, concatenate the list items into a single string.
 
-(defun get-song-list (pattern)
+(defun helm-itunes-get-song-list (pattern)
   "Return a list of matching songs in your iTunes library"
   (mapcar (lambda (song-list)
-            (split-string song-list "\\,\s")) (split-string
-                                               (shell-command-to-string
-                                                (format "osascript -e %S" (search-script pattern)))
-                                               "pattern-match-end,\s\\|pattern-match-end")))
+            (split-string song-list "\\,\s"))
+          (split-string
+           (shell-command-to-string
+            (format "osascript -e %S" (helm-itunes-search-script pattern)))
+           "pattern-match-end,\s\\|pattern-match-end")))
 
 
-(defun itunes-format-track (track)
+(defun helm-itunes-itunes-format-track (track)
   "Given a track, return a formatted string to display"
   (let ((song (nth 2 track))
         (artist (nth 0 track))
@@ -97,7 +98,7 @@ return matches" pattern))
     (format "%S\n %S - %S" song artist album)))
 
 
-(defun spotify-format-track (track)
+(defun helm-itunes-spotify-format-track (track)
   "Return a Spotify compatible string to play"
   (let ((song (nth 2 track))
         (artist (nth 0 track))
@@ -107,24 +108,27 @@ return matches" pattern))
 
 ;;---------- Helm Functions ----------;;
 
-
-(defun itunes-seach-formatted (pattern)
+;; Helm needs an associated list: 'car' for display, 'cdr' for action. 
+;; Our data is the same as what is displayed, 
+;; so each 'key' is the same as its 'value'.
+(defun helm-itunes-search-formatted (pattern)
   "Create the helm search results candidates"
   (mapcar (lambda (track)
-            (cons (itunes-format-track track)
-                  (if (equal music-player "spotify")
-                      (spotify-format-track track)
+            (cons (helm-itunes-itunes-format-track track)
+                  (if (equal helm-itunes-music-player "spotify")
+                      (helm-itunes-spotify-format-track track)
                     (nth 2 track))))
-          (get-song-list pattern)))
+          (helm-itunes-get-song-list pattern)))
 
 
-(defun helm-itunes-search ()
+(defun helm-itunes-helm-search ()
   "Initiate the search"
-  (itunes-seach-formatted helm-pattern))
+  (helm-itunes-search-formatted helm-pattern))
 
 
 (defun helm-itunes-play-track (track)
-  (shell-command (format "osascript -e 'tell application %S to play track %S' " music-player track)))
+  (shell-command (format "osascript -e 'tell application %S to play track %S' "
+                         helm-itunes-music-player track)))
 
 
 ;;;###autoload
@@ -134,7 +138,7 @@ return matches" pattern))
     (delayed . 1)    ; Change the delay to prevent Emacs from crashing.
     (multiline)
     (requires-pattern . 2)
-    (candidates-process . helm-itunes-search)
+    (candidates-process . helm-itunes-helm-search)
     (action . (("Play Track" . helm-itunes-play-track)))))
 
 

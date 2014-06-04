@@ -1,33 +1,31 @@
-;;;  helm-itunes.el Play local Spotify Tracks
+;;; helm-itunes.el Play local Spotify Tracks
 ;; Copyright 2014 Adam Schwartz
 ;;
 ;; Author: Adam Schwartz <adam@adamschwartz.io>
 ;; URL: https://github.com/daschwa/helm-itunes
-;; Created: 2014-06-02 19:32:16
+;;
+;; Created: 2014-06-02
 ;; Version: 0.0.1
+;; Package-Requires: (helm "0.0.0")
 
 ;;; Commentary:
 ;;
-;; A search & play interface for iTunes.
+;; A search & play interface for iTunes and Spotify.
 ;;
-;; There should be a simple way to get the songs to play
-;; with Spotify instead of iTunes.
+;; You can search for either a song, artist, or album.
+;;
+;; Bugs:
+;; Symbols in song titles will sometimes prevent the song from playing.
+;; iTunes will open and close various times upon a search.
 ;;
 ;; Currently only supports OS X.
+;;
+;; Inspired by helm-spotify: https://github.com/krisajenkins/helm-spotify
 ;;
 
 ;;; Code:
 
 (require 'helm)
-
-;; (defvar track-uri nil)
-;; (setq "spotify:local:Beastie+Boys:Ill Communication:Sure+Shot:123")
-;; (shell-command (format "osascript -e 'tell application %S to play track %S'" "Spotify" track-uri))
-
-;; Either an artist, album, or song name to search for.
-(defvar search-pattern nil)
-(setq search-pattern "Sure Shot")
-
 
 ;; Change the music player to Spotify
 (defvar music-player nil "initialize spotify-player variable")
@@ -83,11 +81,12 @@ return matches" pattern))
 ;; Finally, concatenate the list items into a single string.
 
 (defun get-song-list (pattern)
+  "Return a list of matching songs in your iTunes library"
   (mapcar (lambda (song-list)
             (split-string song-list "\\,\s")) (split-string
                                                (shell-command-to-string
                                                 (format "osascript -e %S" (search-script pattern)))
-                                               "pattern-match-end,\s\\|pattern-match-end")))q
+                                               "pattern-match-end,\s\\|pattern-match-end")))
 
 
 (defun itunes-format-track (track)
@@ -95,10 +94,8 @@ return matches" pattern))
   (let ((song (nth 2 track))
         (artist (nth 0 track))
         (album (nth 1 track)))
-    (format "%S\n %S\n %S" song artist album)))
+    (format "%S\n %S - %S" song artist album)))
 
-
-(itunes-format-track '("Artist" "Album" "Song"))
 
 (defun spotify-format-track (track)
   "Return a Spotify compatible string to play"
@@ -107,38 +104,47 @@ return matches" pattern))
         (album (nth 1 track)))
     (format "spotify:local:%s:%s:%s:123" artist album song)))
 
-(spotify-format-track '("Artist" "Album" "Song"))
 
-;; Helm Functions
+;;---------- Helm Functions ----------;;
 
-(defun helm-itunes-search ()
+
+(defun itunes-seach-formatted (pattern)
+  "Create the helm search results candidates"
   (mapcar (lambda (track)
             (cons (itunes-format-track track)
                   (if (equal music-player "spotify")
                       (spotify-format-track track)
                     (nth 2 track))))
-          (get-song-list helm-pattern)))
+          (get-song-list pattern)))
+
+
+(defun helm-itunes-search ()
+  "Initiate the search"
+  (itunes-seach-formatted helm-pattern))
 
 
 (defun helm-itunes-play-track (track)
-  (shell-command (format "osascript -e 'tell application %S to play track %S'" music-player track)))
+  (shell-command (format "osascript -e 'tell application %S to play track %S' " music-player track)))
 
 
-;; Change the delay between searches to prevent Emacs from crashing.
-(setq helm-idle-delay 1)
-
-(defvar helm-source-itunes-track-search
+;;;###autoload
+(defvar helm-source-itunes-search
   '((name . "iTunes Search")
     (volatile)
-    (delayed)
+    (delayed . 1)    ; Change the delay to prevent Emacs from crashing.
     (multiline)
-                                        ;(requires-pattern . 2)
+    (requires-pattern . 2)
     (candidates-process . helm-itunes-search)
     (action . (("Play Track" . helm-itunes-play-track)))))
 
 
+;;;###autoload
 (defun helm-itunes ()
   "Bring up a Spotify search interface in helm."
   (interactive)
-  (helm :sources '(helm-source-itunes-track-search)
+  (helm :sources '(helm-source-itunes-search)
         :buffer "*helm-itunes*"))
+
+
+(provide 'helm-itunes)
+;;; helm-itunes.el ends here

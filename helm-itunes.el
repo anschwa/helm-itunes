@@ -87,9 +87,7 @@ return matches" pattern))
             (split-string song-list "\\,\s")) (split-string
                                                (shell-command-to-string
                                                 (format "osascript -e %S" (search-script pattern)))
-                                               "pattern-match-end,\s\\|pattern-match-end")))
-
-(get-song-list search-pattern)
+                                               "pattern-match-end,\s\\|pattern-match-end")))q
 
 
 (defun itunes-format-track (track)
@@ -119,12 +117,15 @@ return matches" pattern))
                   (if (equal music-player "spotify")
                       (spotify-format-track track)
                     (nth 2 track))))
-          (get-song-list search-pattern)))
+          (get-song-list helm-pattern)))
 
 
 (defun helm-itunes-play-track (track)
   (shell-command (format "osascript -e 'tell application %S to play track %S'" music-player track)))
 
+
+;; Change the delay between searches to prevent Emacs from crashing.
+(setq helm-idle-delay 1)
 
 (defvar helm-source-itunes-track-search
   '((name . "iTunes Search")

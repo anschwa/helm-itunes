@@ -15,8 +15,10 @@
 ;; You can search for either a song, artist, or album.
 ;;
 ;; Bugs:
-;; Symbols in song titles will sometimes prevent the song from playing.
-;; iTunes will open and close various times upon a search.
+;; - Symbols in song titles will sometimes prevent the song from playing
+;; in iTunes. Tracks are "percent-encoded" when played through Spotify, 
+;; so they do not have this problem.
+;; - iTunes will open and close various times upon a search.
 ;;
 ;; Currently only supports OS X.
 ;;
@@ -24,7 +26,7 @@
 ;;
 
 ;;; Code:
-
+(require 'url)
 (require 'helm)
 
 ;; Change the music player to Spotify
@@ -100,16 +102,16 @@ return matches" pattern))
 
 (defun helm-itunes-spotify-format-track (track)
   "Return a Spotify compatible string to play"
-  (let ((song (nth 2 track))
-        (artist (nth 0 track))
-        (album (nth 1 track)))
+  (let ((song (url-hexify-string (nth 2 track)))
+        (artist (url-hexify-string (nth 0 track)))
+        (album (url-hexify-string (nth 1 track))))
     (format "spotify:local:%s:%s:%s:123" artist album song)))
 
 
 ;;---------- Helm Functions ----------;;
 
-;; Helm needs an associated list: 'car' for display, 'cdr' for action. 
-;; Our data is the same as what is displayed, 
+;; Helm needs an associated list: 'car' for display, 'cdr' for action.
+;; Our data is the same as what is displayed,
 ;; so each 'key' is the same as its 'value'.
 (defun helm-itunes-search-formatted (pattern)
   "Create the helm search results candidates"

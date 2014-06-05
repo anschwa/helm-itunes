@@ -21,7 +21,7 @@ Currently only supports OS X.
 
 ### Bugs:
 
-- Song tittles with parenthesis or non-alphanumeric characters will sometimes not play.
+- Symbols in song titles will sometimes prevent the song from playing in iTunes. Tracks are "percent-encoded" when played through Spotify, so they do not have this problem.
 
 - Each search is somehow being repeated, causing iTunes to open and close various times.
 

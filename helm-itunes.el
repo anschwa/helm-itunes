@@ -16,7 +16,7 @@
 ;;
 ;; Bugs:
 ;; - Symbols in song titles will sometimes prevent the song from playing
-;; in iTunes. Tracks are "percent-encoded" when played through Spotify, 
+;; in iTunes. Tracks are "percent-encoded" when played through Spotify,
 ;; so they do not have this problem.
 ;; - iTunes will open and close various times upon a search.
 ;;
@@ -93,7 +93,7 @@ return matches" pattern))
 
 
 (defun helm-itunes-itunes-format-track (track)
-  "Given a track, return a formatted string to display"
+  "Given a TRACK, return a formatted string to display"
   (let ((song (nth 2 track))
         (artist (nth 0 track))
         (album (nth 1 track)))
@@ -148,8 +148,10 @@ return matches" pattern))
 (defun helm-itunes ()
   "Bring up a Spotify search interface in helm."
   (interactive)
-  (helm :sources '(helm-source-itunes-search)
-        :buffer "*helm-itunes*"))
+  (if (equal system-type 'darwin)
+      (helm :sources '(helm-source-itunes-search)
+            :buffer "*helm-itunes*")
+    (message (format "Sorry, helm-itunes does not support %S" system-type))))
 
 
 (provide 'helm-itunes)

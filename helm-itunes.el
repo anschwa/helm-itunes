@@ -30,11 +30,11 @@
 (require 'helm)
 
 ;; Change the music player to Spotify
-(defvar helm-itunes-music-player nil "initialize spotify-player variable")
+(defvar helm-itunes-music-player nil "Initialize spotify-player variable.")
 (setq-default helm-itunes-music-player "itunes")
 
 (defun helm-itunes-player (player)
-  "Choose Spotify or iTunes as the music player"
+  "Choose Spotify or iTunes as the music player."
 
   (interactive "sPlay music through Spotify? (y/n): ")
   (if (or (equal (downcase player) "y")
@@ -83,7 +83,7 @@ return matches" pattern))
 ;; Finally, concatenate the list items into a single string.
 
 (defun helm-itunes-get-song-list (pattern)
-  "Return a list of matching songs in your iTunes library"
+  "Return a list of matching songs in your iTunes library."
   (mapcar (lambda (song-list)
             (split-string song-list "\\,\s"))
           (split-string
@@ -93,7 +93,7 @@ return matches" pattern))
 
 
 (defun helm-itunes-itunes-format-track (track)
-  "Given a TRACK, return a formatted string to display"
+  "Given a TRACK, return a formatted string to display."
   (let ((song (nth 2 track))
         (artist (nth 0 track))
         (album (nth 1 track)))
@@ -101,7 +101,7 @@ return matches" pattern))
 
 
 (defun helm-itunes-spotify-format-track (track)
-  "Return a Spotify compatible string to play"
+  "Return a Spotify compatible string to play."
   (let ((song (url-hexify-string (nth 2 track)))
         (artist (url-hexify-string (nth 0 track)))
         (album (url-hexify-string (nth 1 track))))
@@ -114,7 +114,7 @@ return matches" pattern))
 ;; Our data is the same as what is displayed,
 ;; so each 'key' is the same as its 'value'.
 (defun helm-itunes-search-formatted (pattern)
-  "Create the helm search results candidates"
+  "Create the helm search results candidates."
   (mapcar (lambda (track)
             (cons (helm-itunes-itunes-format-track track)
                   (if (equal helm-itunes-music-player "spotify")
@@ -124,7 +124,7 @@ return matches" pattern))
 
 
 (defun helm-itunes-helm-search ()
-  "Initiate the search"
+  "Initiate the search."
   (helm-itunes-search-formatted helm-pattern))
 
 

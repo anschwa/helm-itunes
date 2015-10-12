@@ -145,7 +145,7 @@ return matches" pattern))
 (defun helm-itunes ()
   "Bring up a Spotify search interface in helm."
   (interactive)
-  (if (equal system-type 'darwin)
+  (if (eq system-type 'darwin)
       (helm :sources 'helm-source-itunes-search
             :buffer "*helm-itunes*")
     (message "Sorry, helm-itunes does not support %S" system-type)))

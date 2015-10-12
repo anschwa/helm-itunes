@@ -132,16 +132,14 @@ return matches" pattern))
   (shell-command (format "osascript -e 'tell application %S to play track %S'"
                          helm-itunes-music-player track)))
 
-
 (defvar helm-source-itunes-search
-  '((name . "iTunes Search")
-    (volatile)
-    (delayed . 1)    ; Change the delay to prevent Emacs from crashing.
-    (multiline)
-    (requires-pattern . 2)
-    (candidates-process . helm-itunes-helm-search)
-    (action . (("Play Track" . helm-itunes-play-track)))))
-
+  (helm-build-async-source "iTunes Search"
+    :candidates-process #'helm-itunes-helm-search
+    :delayed 1                ; Change the delay to prevent Emacs from crashing.
+    :volatile t
+    :multiline t
+    :requires-pattern 2
+    :action '(("Play Track" . helm-itunes-play-track))))
 
 ;;;###autoload
 (defun helm-itunes ()

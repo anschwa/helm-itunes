@@ -129,11 +129,10 @@ return matches" pattern))
 
 
 (defun helm-itunes-play-track (track)
-  (shell-command (format "osascript -e 'tell application %S to play track %S' "
+  (shell-command (format "osascript -e 'tell application %S to play track %S'"
                          helm-itunes-music-player track)))
 
 
-;;;###autoload
 (defvar helm-source-itunes-search
   '((name . "iTunes Search")
     (volatile)
@@ -149,9 +148,9 @@ return matches" pattern))
   "Bring up a Spotify search interface in helm."
   (interactive)
   (if (equal system-type 'darwin)
-      (helm :sources '(helm-source-itunes-search)
+      (helm :sources 'helm-source-itunes-search
             :buffer "*helm-itunes*")
-    (message (format "Sorry, helm-itunes does not support %S" system-type))))
+    (message "Sorry, helm-itunes does not support %S" system-type)))
 
 
 (provide 'helm-itunes)
